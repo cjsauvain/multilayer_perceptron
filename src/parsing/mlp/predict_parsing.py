@@ -14,7 +14,7 @@ def parse_predict_command_line(subparsers: argparse._SubParsersAction):
     )
     predict_parser.add_argument(
         "--params-path",
-        help="Path of the file that contains weights + biases after training",
+        help="Path of the file that contains model's weights + biases",
         type=str,
         default="params.npz"
     )

@@ -4,17 +4,18 @@ import numpy as np
 import pandas as pd
 
 from dataclasses import dataclass
+from src.parsing.mlp.schema_validation import validate_model_schema
 from src.load_dataset import load_dataset
 from src.model.builder import network_builder
+from src.preprocessing import get_target, min_max, z_score
 from src.visualization import visualization
-from src.preprocessing import get_target, z_score, min_max
 
 
 @dataclass
 class TrainConfig:
     dataset_training: str
     dataset_validation: str
-    hidden_layers: tuple[int]
+    layers: tuple[int, ...]
     features: list[str]
     activation: str
     weights_initializer: str
@@ -30,18 +31,20 @@ class TrainConfig:
 
 
 def _get_train_config(args: argparse.Namespace) -> TrainConfig:
+    model_json = validate_model_schema(args.model_path, return_model=True)
+
     return TrainConfig(
         dataset_training=args.dataset_training,
         dataset_validation=args.dataset_validation,
-        hidden_layers=args.hidden_layers,
-        features=args.features,
-        activation=args.activation,
-        weights_initializer=args.weights_initializer,
+        layers=model_json["layers"],
+        features=model_json["features"],
+        activation=model_json["activation"],
+        weights_initializer=model_json["weights_initializer"],
         learning_rate=args.learning_rate,
         epochs=args.epochs,
         disable_epochs_metrics=args.disable_epochs_metrics,
         disable_visualization=args.disable_visualization,
-        normalization=args.normalization,
+        normalization=model_json["normalization"]["mode"],
         params_path=args.params_path,
         model_path=args.model_path,
         seed=args.seed,
@@ -51,16 +54,18 @@ def _get_train_config(args: argparse.Namespace) -> TrainConfig:
 
 def _save_model_to_file(
         model_path: str,
-        layers: tuple[int],
+        layers: tuple[int, ...],
         activation: str,
         features: list[str],
-        json_normalization: dict
+        weights_initializer: str,
+        normalization: dict
 ):
     json_model = {
         "layers": layers,
         "activation": activation,
         "features": features,
-        "normalization": json_normalization["normalization"]
+        "weights_initializer": weights_initializer,
+        "normalization": normalization["normalization"]
     }
 
     with open(model_path, "w") as file:
@@ -123,12 +128,12 @@ def train(args: argparse.Namespace):
     )
 
     # Save model's architecture, features and normalization data to file
-    layers = (*config.hidden_layers, (y_train.shape[0]))
     _save_model_to_file(
         config.model_path,
-        layers,
+        config.layers,
         config.activation,
         config.features,
+        config.weights_initializer,
         json_normalization
     )
 
@@ -137,7 +142,7 @@ def train(args: argparse.Namespace):
         np.random.seed(config.seed)
 
     network = network_builder(
-        layers,
+        config.layers,
         config.activation,
         config.weights_initializer
     )

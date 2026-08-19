@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from dataclasses import dataclass
+from src.parsing.mlp.schema_validation import validate_model_schema
 from src.load_dataset import load_dataset
 from src.model.metrics import ft_accuracy
 from src.model.builder import network_builder
@@ -22,6 +23,8 @@ class PredictConfig:
 
 
 def _get_predict_config(args: argparse.Namespace) -> PredictConfig:
+    validate_model_schema(args.model_path)
+
     return PredictConfig(
         dataset_path=args.dataset,
         params_path=args.params_path,
@@ -55,7 +58,7 @@ def _retrieve_params(
 
 def _retrieve_model_config(
         model_path: str
-) -> tuple[tuple[int], str, list[str], dict]:
+) -> tuple[tuple[int, ...], str, list[str], dict]:
     with open(model_path, "r") as file:
         model_json = json.load(file)
 
@@ -106,7 +109,7 @@ def predict(args: argparse.Namespace):
     config = _get_predict_config(args)
 
     # Retrieve model's architecture, features and normalization data
-    layers, activation, features, normalization_json = _retrieve_model_config(
+    layers, activation, features, normalization = _retrieve_model_config(
         config.model_path
     )
 
@@ -115,7 +118,7 @@ def predict(args: argparse.Namespace):
 
     # Build X ndarray from DataFrame to predict
     df = load_dataset(config.dataset_path)
-    X = _preprocessing(df, features, normalization_json)
+    X = _preprocessing(df, features, normalization)
 
     # Create Neuron Network
     network = network_builder(layers, activation)
@@ -127,7 +130,11 @@ def predict(args: argparse.Namespace):
     y_pred = network.predict(X)
 
     # Accuracy
-    if config.display_accuracy and "diagnosis" in df.columns:
+    diagnosis_valid = (
+        "diagnosis" in df.columns
+        and not df["diagnosis"].isna().any()
+    )
+    if config.display_accuracy and diagnosis_valid:
         _display_prediction_accuracy(df, y_pred)
 
     # Save Prediction to file

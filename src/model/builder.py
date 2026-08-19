@@ -3,7 +3,7 @@ from src.model.layer import DenseLayer
 
 
 def network_builder(
-        layers: tuple[int],
+        layers: tuple[int, ...],
         activation: str,
         weights_initializer: str = "HeNormal"
 ) -> Network:

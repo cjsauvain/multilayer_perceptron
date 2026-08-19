@@ -1,17 +1,16 @@
 import numpy as np
 
 from src.model.activation import (
-    sigmoid,
-    sigmoid_deriv,
     relu,
     relu_deriv,
+    sigmoid,
+    sigmoid_deriv,
     softmax,
 )
 from src.model.initializer import (
-    he_normal_initializer,
-    glorot_normal_initializer
+    glorot_normal_initializer,
+    he_normal_initializer
 )
-
 
 ACTIVATIONS = {
     "softmax": (softmax, None),
