@@ -15,6 +15,7 @@ class SplitConfig:
 
 
 def _get_split_config(args: argparse.Namespace) -> SplitConfig:
+    """Build a SplitConfig from parsed CLI arguments."""
     return SplitConfig(
         dataset_path=args.dataset,
         training_dataset=args.training_dataset,
@@ -25,6 +26,7 @@ def _get_split_config(args: argparse.Namespace) -> SplitConfig:
 
 
 def split_dataset(args: argparse.Namespace):
+    """Split a dataset into shuffled train/validation CSVs, stratified by diagnosis."""
     config = _get_split_config(args)
 
     df = load_dataset(

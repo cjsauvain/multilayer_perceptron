@@ -2,6 +2,7 @@ import argparse
 
 
 def _ratio_between_0_and_1(value: str) -> float:
+    """Parse a CLI argument as a float strictly greater than 0 and up to 1."""
     f = float(value)
 
     if not 0 < f <= 1:
@@ -13,6 +14,7 @@ def _ratio_between_0_and_1(value: str) -> float:
 
 
 def parse_split_command_line(subparsers: argparse._SubParsersAction):
+    """Register the `split-dataset` subcommand and its arguments."""
     split_parser = subparsers.add_parser(
         "split-dataset",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter

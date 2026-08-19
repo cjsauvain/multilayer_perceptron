@@ -10,6 +10,7 @@ from src.train import train
 
 
 def main():
+    """Parse CLI arguments and dispatch to the selected mode's handler."""
     try:
         args = parse_command_line()
 

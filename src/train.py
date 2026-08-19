@@ -31,6 +31,7 @@ class TrainConfig:
 
 
 def _get_train_config(args: argparse.Namespace) -> TrainConfig:
+    """Build a TrainConfig by merging CLI arguments with the validated model.json."""
     model_json = validate_model_schema(args.model_path, return_model=True)
 
     return TrainConfig(
@@ -60,6 +61,7 @@ def _save_model_to_file(
         weights_initializer: str,
         normalization: dict
 ):
+    """Write the model architecture, features and normalization data to model_path."""
     json_model = {
         "layers": layers,
         "activation": activation,
@@ -78,6 +80,7 @@ def _preprocessing(
         normalization_method: str,
         features: list[str]
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict]:
+    """Normalize train/validation features and one-hot encode their targets."""
     X_train = np.array(())
     X_valid = np.array(())
     y_train = get_target(training_df)
@@ -112,6 +115,7 @@ def _preprocessing(
 
 
 def train(args: argparse.Namespace):
+    """Run the full training pipeline: preprocess, fit the network, save results."""
     config = _get_train_config(args)
 
     # Build Training + Validation DataFrames

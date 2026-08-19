@@ -7,6 +7,7 @@ def min_max(
         mins: np.ndarray | None = None,
         maxs: np.ndarray | None = None
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Scale features to [0, 1] using given or computed min/max bounds."""
     X = np.array(df)
 
     X_mins = X.min(axis=0) if mins is None else mins
@@ -22,6 +23,7 @@ def z_score(
         means: np.ndarray | None = None,
         stds: np.ndarray | None = None
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Standardize features using given or computed mean/standard deviation."""
     X = np.array(df)
 
     X_means = X.mean(axis=0) if means is None else means
@@ -33,6 +35,7 @@ def z_score(
 
 
 def get_target(df: pd.DataFrame) -> np.ndarray:
+    """One-hot encode the diagnosis column into B/M columns."""
     y_df = df["diagnosis"]
 
     # First column: 0="M", 1="B"

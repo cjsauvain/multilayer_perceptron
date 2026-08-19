@@ -2,6 +2,7 @@ import argparse
 
 
 def parse_predict_command_line(subparsers: argparse._SubParsersAction):
+    """Register the `predict` subcommand and its arguments."""
     predict_parser = subparsers.add_parser(
         "predict",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter

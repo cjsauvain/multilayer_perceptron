@@ -10,6 +10,7 @@ from src.parsing.feature_analysis.parsing import parse_command_line
 
 
 def _feature_selection(df: pd.DataFrame, features_nb_to_keep: int):
+    """Print the N features most correlated with diagnosis, pruning redundant pairs."""
     df["diagnosis"] = (df["diagnosis"] == "M").astype('int')
 
     diagnosis_corr = df.corr()["diagnosis"].abs()
@@ -44,6 +45,7 @@ def _feature_selection(df: pd.DataFrame, features_nb_to_keep: int):
 
 
 def _feature_visualization(df: pd.DataFrame, visualization_mode: str):
+    """Plot every feature individually as a boxplot or scatter plot grid."""
     df = df.drop(columns=["ID", "diagnosis"])
 
     _, axes = plt.subplots(5, 6, figsize=(18, 9))
@@ -64,6 +66,7 @@ def _feature_visualization(df: pd.DataFrame, visualization_mode: str):
 
 
 def main():
+    """Parse CLI arguments and run the selected feature analysis mode."""
     try:
         args = parse_command_line()
 
