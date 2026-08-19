@@ -4,6 +4,7 @@ from src.parsing.utils import positive_int
 
 
 def parse_train_command_line(subparsers: argparse._SubParsersAction):
+    """Register the `train` subcommand and its arguments."""
     train_parser = subparsers.add_parser(
         "train",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter

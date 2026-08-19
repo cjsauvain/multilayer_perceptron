@@ -24,12 +24,15 @@ INITIALIZERS = {
 
 
 class DenseLayer:
+    """A fully connected layer with its own weights, biases and activation."""
+
     def __init__(
             self,
             n_neurons: int,
             activation: str = "relu",
             weights_initializer: str = "HeNormal"
     ):
+        """Configure the layer's size, activation and weights initializer."""
         self.n_neurons = n_neurons
         self.activation_fn, self.activation_deriv = ACTIVATIONS[activation]
         self.A = None
@@ -39,6 +42,7 @@ class DenseLayer:
         self.b = None
 
     def __repr__(self) -> str:
+        """Return a readable summary of the layer's configuration."""
         activation_deriv_str = (
             self.activation_deriv.__name__ if self.activation_deriv is not None
             else "None"
@@ -51,11 +55,13 @@ class DenseLayer:
         )
 
     def initialize(self, n_in: int):
+        """Initialize the layer's weights and zero biases given the input size."""
         initializer_fn = INITIALIZERS[self.weights_initializer]
         self.W = initializer_fn(n_in, self.n_neurons)
         self.b = np.zeros((self.n_neurons, 1))
 
     def forward(self):
+        """Compute this layer's activations from the previous layer's output."""
         self.A = self.activation_fn(self.prev_A, self.W, self.b)
 
     def backward(
@@ -64,6 +70,7 @@ class DenseLayer:
             learning_rate: float,
             output_layer: bool = False
     ) -> np.ndarray:
+        """Compute gradients, update weights/biases, and return the upstream gradient."""
         m = self.prev_A.shape[1]
 
         dZ = dA if output_layer else dA * self.activation_deriv(self.A)

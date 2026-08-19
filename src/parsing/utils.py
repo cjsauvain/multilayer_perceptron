@@ -2,6 +2,7 @@ import argparse
 
 
 def positive_int(value: str) -> int:
+    """Parse a CLI argument as a strictly positive integer."""
     i = int(value)
 
     if i <= 0:

@@ -2,6 +2,7 @@ import numpy as np
 
 
 def ft_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Compute the percentage of correctly predicted classes."""
     y_true_classes = y_true.argmax(axis=0)
     y_pred_classes = y_pred.argmax(axis=0)
 
@@ -14,6 +15,7 @@ def ft_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 
 
 def ft_precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Compute precision (%) for the malignant class: TP / (TP + FP)."""
     y_pred_classes = y_pred.argmax(axis=0)
 
     tp = np.sum((y_true[1] == 1) & (y_pred_classes == 1))
@@ -25,6 +27,7 @@ def ft_precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 
 
 def ft_recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Compute recall (%) for the malignant class: TP / (TP + FN)."""
     y_pred_classes = y_pred.argmax(axis=0)
 
     tp = np.sum((y_true[1] == 1) & (y_pred_classes == 1))
@@ -36,6 +39,7 @@ def ft_recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 
 
 def ft_f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Compute the harmonic mean of precision and recall for the malignant class."""
     precision = ft_precision(y_true, y_pred)
     recall = ft_recall(y_true, y_pred)
 
