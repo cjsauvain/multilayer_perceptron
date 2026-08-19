@@ -1,0 +1,97 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Neural Network",
+    "description": "Configuration Schema of a Neural Network",
+    "type": "object",
+    "properties": {
+        "layers": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+            },
+            "minItems": 1,
+            "default": [24, 24, 2]
+        },
+        "activation": {
+            "type": "string",
+            "enum": ["relu", "sigmoid"]
+        },
+        "features": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "radius_mean",
+                    "texture_mean",
+                    "perimeter_mean",
+                    "area_mean",
+                    "smoothness_mean",
+                    "compactness_mean",
+                    "concavity_mean",
+                    "concave_points_mean",
+                    "symmetry_mean",
+                    "fractal_dimension_mean",
+                    "radius_se",
+                    "texture_se",
+                    "perimeter_se",
+                    "area_se",
+                    "smoothness_se",
+                    "compactness_se",
+                    "concavity_se",
+                    "concave_points_se",
+                    "symmetry_se",
+                    "fractal_dimension_se",
+                    "radius_worst",
+                    "texture_worst",
+                    "perimeter_worst",
+                    "area_worst",
+                    "smoothness_worst",
+                    "compactness_worst",
+                    "concavity_worst",
+                    "concave_points_worst",
+                    "symmetry_worst",
+                    "fractal_dimension_worst"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "weights_initializer": {
+            "type": "string",
+            "enum": ["HeNormal", "GlorotNormal"]
+        },
+        "normalization": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "type": "string",
+                    "enum": ["z-score", "min-max"]
+                }
+            },
+            "if": {
+                "properties": {
+                    "mode": { "const": "z-score" }
+                }
+            },
+            "then": {
+                "properties": {
+                    "mode": { "const": "z-score" },
+                    "means": { "type": "array", "items": { "type": "number" } },
+                    "stds": { "type": "array", "items": { "type": "number" } }
+                },
+                "additionalProperties": false
+            },
+            "else": {
+                "properties": {
+                    "mode": { "const": "min-max" },
+                    "mins": { "type": "array", "items": { "type": "number" } },
+                    "maxs": { "type": "array", "items": { "type": "number" } }
+                },
+                "additionalProperties": false
+            },
+            "required": ["mode"]
+        }
+    },
+    "required": ["layers", "activation", "features", "weights_initializer", "normalization"]
+}

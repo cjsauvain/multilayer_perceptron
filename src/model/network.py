@@ -1,9 +1,10 @@
+
 import numpy as np
 from tqdm import tqdm
 
-from src.model.metrics import ft_accuracy
-from src.model.loss import binary_cross_entropy
 from src.model.layer import DenseLayer
+from src.model.loss import binary_cross_entropy
+from src.model.metrics import ft_accuracy, ft_f1_score, ft_precision, ft_recall
 
 
 class EarlyStopping:
@@ -33,6 +34,12 @@ class Network:
         self.loss_valid = []
         self.acc_train = []
         self.acc_valid = []
+        self.precision_train = []
+        self.precision_valid = []
+        self.recall_train = []
+        self.recall_valid = []
+        self.f1_score_train = []
+        self.f1_score_valid = []
         self.stopping_reason = ""
 
     def __repr__(self):
@@ -96,13 +103,22 @@ class Network:
 
         loss = binary_cross_entropy(y_true, y_pred)
         accuracy = ft_accuracy(y_true, y_pred)
+        precision = ft_precision(y_true, y_pred)
+        recall = ft_recall(y_true, y_pred)
+        f1_score = ft_f1_score(y_true, y_pred)
 
         if mode == "train":
             self.loss_train.append(loss)
             self.acc_train.append(accuracy)
+            self.precision_train.append(precision)
+            self.recall_train.append(recall)
+            self.f1_score_train.append(f1_score)
         elif mode == "valid":
             self.loss_valid.append(loss)
             self.acc_valid.append(accuracy)
+            self.precision_valid.append(precision)
+            self.recall_valid.append(recall)
+            self.f1_score_valid.append(f1_score)
 
         return loss
 
@@ -141,7 +157,7 @@ class Network:
             if disable_epochs_metrics is False:
                 print(
                     f"epoch {epoch}/{epochs} - ",
-                    f"loss: {loss_train} - val_loss: {loss_valid}"
+                    f"loss: {loss_train:.4f} - val_loss: {loss_valid:.4f}"
                 )
 
             # Early Stopping
