@@ -26,7 +26,10 @@ def _get_split_config(args: argparse.Namespace) -> SplitConfig:
 
 
 def split_dataset(args: argparse.Namespace):
-    """Split a dataset into shuffled train/validation CSVs, stratified by diagnosis."""
+    """
+    Split a dataset into shuffled train/validation CSVs,
+    stratified by diagnosis.
+    """
     config = _get_split_config(args)
 
     df = load_dataset(

@@ -21,7 +21,9 @@ class EarlyStopping:
         return self.counter == 0
 
     def update_loss(self, loss):
-        """Update the best loss and patience counter; return True on improvement."""
+        """
+        Update the best loss and patience counter; return True on improvement.
+        """
         if loss < self.best_loss:
             self.best_loss = loss
             self.counter = self.patience
@@ -32,7 +34,10 @@ class EarlyStopping:
 
 
 class Network:
-    """A feedforward neural network made of DenseLayers, trained by backpropagation."""
+    """
+    A feedforward neural network made of DenseLayers,
+    trained by backpropagation.
+    """
 
     def __init__(self, layers: tuple[DenseLayer, ...]):
         """Store the layers and initialize training history containers."""
@@ -55,7 +60,9 @@ class Network:
         return f"{self.layers}"
 
     def _initialize(self, n_in: int):
-        """Initialize weights and biases of every layer given the input size."""
+        """
+        Initialize weights and biases of every layer given the input size.
+        """
         for layer in self.layers:
             layer.initialize(n_in)
             n_in = layer.n_neurons
@@ -81,13 +88,18 @@ class Network:
             self.params[f"b{layer_index}"] = np.copy(layer.b)
 
     def _restore_best_parameters(self):
-        """Restore each layer's weights and biases from the last best snapshot."""
+        """
+        Restore each layer's weights and biases from the last best snapshot.
+        """
         for layer_index, layer in enumerate(self.layers, start=1):
             layer.W = np.copy(self.params[f"W{layer_index}"])
             layer.b = np.copy(self.params[f"b{layer_index}"])
 
     def forward(self, X_train: np.ndarray) -> np.ndarray:
-        """Run a forward pass through all layers and return the output activations."""
+        """
+        Run a forward pass through all layers and
+        return the output activations.
+        """
         prev_A = X_train
         for layer in self.layers:
             layer.prev_A = prev_A
@@ -102,7 +114,9 @@ class Network:
             y_pred: np.ndarray,
             learning_rate: float
     ):
-        """Run a backward pass through all layers, updating their parameters."""
+        """
+        Run a backward pass through all layers, updating their parameters.
+        """
         dZ = y_pred - y_true
         dA = self.layers[-1].backward(dZ, learning_rate, output_layer=True)
         for layer in reversed(self.layers[:-1]):
@@ -115,7 +129,10 @@ class Network:
             mode: str,
             y_pred: np.ndarray | None = None
     ) -> float:
-        """Compute loss and metrics for a set, appending them to the train/valid history."""
+        """
+        Compute loss and metrics for a set,
+        appending them to the train/valid history.
+        """
         y_pred = self.forward(X) if y_pred is None else y_pred
 
         loss = binary_cross_entropy(y_true, y_pred)
@@ -150,7 +167,10 @@ class Network:
             learning_rate: float,
             patience: int
     ):
-        """Train the network with gradient descent until max epochs or early stopping."""
+        """
+        Train the network with gradient descent
+        until max epochs or early stopping.
+        """
         self._initialize(X_train.shape[0])
 
         early_stopping = EarlyStopping(patience)
@@ -192,5 +212,8 @@ class Network:
         )
 
     def predict(self, X) -> np.ndarray:
-        """Return the network's output activations (class probabilities) for X."""
+        """
+        Return the network's output activations
+        (class probabilities) for X.
+        """
         return self.forward(X)

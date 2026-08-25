@@ -5,7 +5,10 @@ from src.parsing.utils import positive_int
 
 
 def parse_command_line() -> argparse.Namespace:
-    """Build the feature_analysis.py CLI parser with its subcommands and arguments."""
+    """
+    Build the feature_analysis.py CLI parser
+    with its subcommands and arguments.
+    """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )

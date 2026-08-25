@@ -7,7 +7,10 @@ def validate_model_schema(
         model_path: str,
         return_model: bool = False
 ) -> dict | None:
-    """Validate a model.json file against model.schema.json, optionally returning it."""
+    """
+    Validate a model.json file against model.schema.json,
+    optionally returning it.
+    """
     with open(model_path, "r") as file:
         model = json.load(file)
 

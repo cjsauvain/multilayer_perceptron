@@ -28,7 +28,9 @@ def relu_deriv(A: np.ndarray) -> np.ndarray:
 
 
 def softmax(prev_A: np.ndarray, W: np.ndarray, b: np.ndarray) -> np.ndarray:
-    """Apply the affine transform W·prev_A + b then a numerically stable softmax."""
+    """
+    Apply the affine transform W·prev_A + b then a numerically stable softmax.
+    """
     Z = W.dot(prev_A) + b
     Z_stable = Z - np.max(Z, axis=0, keepdims=True)
     Z_exp = np.exp(Z_stable)

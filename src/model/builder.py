@@ -7,7 +7,10 @@ def network_builder(
         activation: str,
         weights_initializer: str = "HeNormal"
 ) -> Network:
-    """Build a Network with the given hidden layer sizes and a softmax output layer."""
+    """
+    Build a Network with the given hidden layer sizes
+    and a softmax output layer.
+    """
     layers_config = tuple(
         # Hidden Layers
         DenseLayer(n_neurons, activation, weights_initializer)

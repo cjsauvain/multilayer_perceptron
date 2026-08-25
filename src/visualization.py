@@ -10,7 +10,9 @@ def _plot_metric(
         metric_valid: list,
         metric: str
 ):
-    """Plot a metric's training and validation curves against epochs on one axis."""
+    """
+    Plot a metric's training and validation curves against epochs on one axis.
+    """
     ax.plot(
         range(len(metric_train)),
         metric_train,
@@ -32,7 +34,10 @@ def _plot_metric(
 
 
 def visualization(network: Network):
-    """Display loss, accuracy, precision, recall and f1-score curves for a trained network."""
+    """
+    Display loss, accuracy, precision,
+    recall and f1-score curves for a trained network.
+    """
     _, axes = plt.subplots(2, 3, figsize=(16, 6))
 
     _plot_metric(axes[0][0], network.loss_train, network.loss_valid, "loss")
