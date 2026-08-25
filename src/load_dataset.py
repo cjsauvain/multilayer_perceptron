@@ -8,7 +8,9 @@ def load_dataset(
         shuffle: bool = False,
         seed: int | None = None
 ) -> pd.DataFrame:
-    """Load a WDBC dataset CSV, applying column names if the file has no header."""
+    """
+    Load a WDBC dataset CSV, applying column names if the file has no header.
+    """
     df = pd.read_csv(dataset_path, header=None, nrows=1)
 
     if df.iloc[0, 1] in ("M", "B"):

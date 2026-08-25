@@ -55,13 +55,17 @@ class DenseLayer:
         )
 
     def initialize(self, n_in: int):
-        """Initialize the layer's weights and zero biases given the input size."""
+        """
+        Initialize the layer's weights and zero biases given the input size.
+        """
         initializer_fn = INITIALIZERS[self.weights_initializer]
         self.W = initializer_fn(n_in, self.n_neurons)
         self.b = np.zeros((self.n_neurons, 1))
 
     def forward(self):
-        """Compute this layer's activations from the previous layer's output."""
+        """
+        Compute this layer's activations from the previous layer's output.
+        """
         self.A = self.activation_fn(self.prev_A, self.W, self.b)
 
     def backward(
@@ -70,7 +74,10 @@ class DenseLayer:
             learning_rate: float,
             output_layer: bool = False
     ) -> np.ndarray:
-        """Compute gradients, update weights/biases, and return the upstream gradient."""
+        """
+        Compute gradients, update weights/biases,
+        and return the upstream gradient.
+        """
         m = self.prev_A.shape[1]
 
         dZ = dA if output_layer else dA * self.activation_deriv(self.A)

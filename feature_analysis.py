@@ -10,7 +10,10 @@ from src.parsing.feature_analysis.parsing import parse_command_line
 
 
 def _feature_selection(df: pd.DataFrame, features_nb_to_keep: int):
-    """Print the N features most correlated with diagnosis, pruning redundant pairs."""
+    """
+    Print the N features most correlated with
+    diagnosis, pruning redundant pairs.
+    """
     df["diagnosis"] = (df["diagnosis"] == "M").astype('int')
 
     diagnosis_corr = df.corr()["diagnosis"].abs()

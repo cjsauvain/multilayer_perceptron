@@ -36,7 +36,9 @@ def _get_predict_config(args: argparse.Namespace) -> PredictConfig:
 
 
 def _display_prediction_accuracy(df: pd.DataFrame, y_pred: np.ndarray):
-    """Print the accuracy of predictions against the dataset's true diagnosis."""
+    """
+    Print the accuracy of predictions against the dataset's true diagnosis.
+    """
     y_true = get_target(df).T
     accuracy = ft_accuracy(y_true, y_pred)
     print(f"Accuracy: {accuracy:.2f}%")
@@ -45,7 +47,9 @@ def _display_prediction_accuracy(df: pd.DataFrame, y_pred: np.ndarray):
 def _retrieve_params(
         params_path: str
 ) -> tuple[tuple[np.ndarray], tuple[np.ndarray]]:
-    """Load and order the per-layer weight and bias arrays from an .npz file."""
+    """
+    Load and order the per-layer weight and bias arrays from an .npz file.
+    """
     params = np.load(params_path)
 
     keys_W = [key for key in params.files if key.startswith("W")]
@@ -62,7 +66,10 @@ def _retrieve_params(
 def _retrieve_model_config(
         model_path: str
 ) -> tuple[tuple[int, ...], str, list[str], dict]:
-    """Read the architecture, activation, features and normalization from model.json."""
+    """
+    Read the architecture, activation, features and
+    normalization from model.json.
+    """
     with open(model_path, "r") as file:
         model_json = json.load(file)
 
@@ -75,7 +82,9 @@ def _retrieve_model_config(
 
 
 def _save_pred_to_file(y_pred: np.ndarray, output_file: str):
-    """Convert predicted class probabilities to B/M labels and write them to CSV."""
+    """
+    Convert predicted class probabilities to B/M labels and write them to CSV.
+    """
     # Build diagnosis column
     y_pred_classes = y_pred.argmax(axis=0)
     diagnosis = np.where(y_pred_classes == 1, "M", "B")
@@ -96,7 +105,9 @@ def _preprocessing(
         features: list[str],
         normalization_json: dict
 ) -> np.ndarray:
-    """Apply the stored normalization (z-score or min-max) to the input features."""
+    """
+    Apply the stored normalization (z-score or min-max) to the input features.
+    """
     X = np.ndarray(())
 
     if normalization_json["mode"] == "z-score":
@@ -112,7 +123,9 @@ def _preprocessing(
 
 
 def predict(args: argparse.Namespace):
-    """Run the full prediction pipeline: load model/params, predict, save results."""
+    """
+    Run the full prediction pipeline: load model/params, predict, save results.
+    """
     config = _get_predict_config(args)
 
     # Retrieve model's architecture, features and normalization data

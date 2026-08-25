@@ -7,7 +7,10 @@ from src.parsing.mlp.split_parsing import parse_split_command_line
 
 
 def parse_command_line():
-    """Build the mlp.py CLI parser with its train/predict/split-dataset subcommands."""
+    """
+    Build the mlp.py CLI parser with
+    its train/predict/split-dataset subcommands.
+    """
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="mode", required=True)
 

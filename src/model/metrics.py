@@ -39,7 +39,9 @@ def ft_recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 
 
 def ft_f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """Compute the harmonic mean of precision and recall for the malignant class."""
+    """
+    Compute the harmonic mean of precision and recall for the malignant class.
+    """
     precision = ft_precision(y_true, y_pred)
     recall = ft_recall(y_true, y_pred)
 
