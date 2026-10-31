@@ -1,8 +1,9 @@
 import argparse
+from dataclasses import dataclass
+
 import pandas as pd
 
 from src.load_dataset import load_dataset
-from dataclasses import dataclass
 
 
 @dataclass
@@ -21,7 +22,7 @@ def _get_split_config(args: argparse.Namespace) -> SplitConfig:
         training_dataset=args.training_dataset,
         validation_dataset=args.validation_dataset,
         train_ratio=args.train_ratio,
-        seed=args.seed
+        seed=args.seed,
     )
 
 
@@ -32,11 +33,7 @@ def split_dataset(args: argparse.Namespace):
     """
     config = _get_split_config(args)
 
-    df = load_dataset(
-        config.dataset_path,
-        shuffle=True,
-        seed=config.seed
-    )
+    df = load_dataset(config.dataset_path, shuffle=True, seed=config.seed)
     df_B = df[df["diagnosis"] == "B"].drop(columns="ID")
     df_M = df[df["diagnosis"] == "M"].drop(columns="ID")
 
@@ -55,4 +52,6 @@ def split_dataset(args: argparse.Namespace):
     )
 
     training_df.to_csv(config.training_dataset, index=False)
+    print(f"Training dataset saved to '{config.training_dataset}'")
     validation_df.to_csv(config.validation_dataset, index=False)
+    print(f"Validation dataset saved to '{config.validation_dataset}'")

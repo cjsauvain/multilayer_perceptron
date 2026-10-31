@@ -3,6 +3,7 @@
 import sys
 
 from jsonschema import ValidationError
+
 from src.parsing.mlp.parsing import parse_command_line
 from src.predict import predict
 from src.split import split_dataset
@@ -30,6 +31,10 @@ def main():
         sys.exit(1)
 
     except (KeyError, ValueError) as e:
+        print(f"{type(e).__name__}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    except Exception as e:
         print(f"{type(e).__name__}: {e}", file=sys.stderr)
         sys.exit(1)
 

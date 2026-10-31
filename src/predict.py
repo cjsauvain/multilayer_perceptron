@@ -2,14 +2,16 @@ import argparse
 import json
 import os
 import re
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
 
-from dataclasses import dataclass
-from src.parsing.mlp.schema_validation import validate_model_schema
 from src.load_dataset import load_dataset
-from src.model.metrics import ft_accuracy
 from src.model.builder import network_builder
+from src.model.loss import binary_cross_entropy
+from src.model.metrics import ft_accuracy
+from src.parsing.mlp.schema_validation import validate_model_schema
 from src.preprocessing import get_target, min_max, z_score
 
 
@@ -31,40 +33,29 @@ def _get_predict_config(args: argparse.Namespace) -> PredictConfig:
         params_path=args.params_path,
         model_path=args.model_path,
         display_accuracy=args.display_accuracy,
-        output_file=args.output_file
+        output_file=args.output_file,
     )
 
 
-def _display_prediction_accuracy(df: pd.DataFrame, y_pred: np.ndarray):
-    """
-    Print the accuracy of predictions against the dataset's true diagnosis.
-    """
-    y_true = get_target(df).T
-    accuracy = ft_accuracy(y_true, y_pred)
-    print(f"Accuracy: {accuracy:.2f}%")
-
-
-def _retrieve_params(
-        params_path: str
-) -> tuple[tuple[np.ndarray], tuple[np.ndarray]]:
+def _retrieve_params(params_path: str) -> tuple[tuple[np.ndarray], tuple[np.ndarray]]:
     """
     Load and order the per-layer weight and bias arrays from an .npz file.
     """
     params = np.load(params_path)
 
     keys_W = [key for key in params.files if key.startswith("W")]
-    keys_W.sort(key=lambda k: int(re.search(r'\d+', k).group()))
+    keys_W.sort(key=lambda k: int(re.search(r"\d+", k).group()))
     W = [params[key] for key in keys_W]
 
     keys_b = [key for key in params.files if key.startswith("b")]
-    keys_b.sort(key=lambda k: int(re.search(r'\d+', k).group()))
+    keys_b.sort(key=lambda k: int(re.search(r"\d+", k).group()))
     b = [params[key] for key in keys_b]
 
     return tuple(W), tuple(b)
 
 
 def _retrieve_model_config(
-        model_path: str
+    model_path: str,
 ) -> tuple[tuple[int, ...], str, list[str], dict]:
     """
     Read the architecture, activation, features and
@@ -77,7 +68,7 @@ def _retrieve_model_config(
             model_json["layers"],
             model_json["activation"],
             model_json["features"],
-            model_json["normalization"]
+            model_json["normalization"],
         )
 
 
@@ -95,15 +86,12 @@ def _save_pred_to_file(y_pred: np.ndarray, output_file: str):
         os.makedirs(output_dir, exist_ok=True)
 
     # Write to file
-    pd.DataFrame(
-        {"diagnosis": diagnosis}
-    ).to_csv(output_file, index=False)
+    pd.DataFrame({"diagnosis": diagnosis}).to_csv(output_file, index=False)
+    print(f"\nPredictions saved to '{output_file}'")
 
 
 def _preprocessing(
-        df: pd.DataFrame,
-        features: list[str],
-        normalization_json: dict
+    df: pd.DataFrame, features: list[str], normalization_json: dict
 ) -> np.ndarray:
     """
     Apply the stored normalization (z-score or min-max) to the input features.
@@ -149,13 +137,15 @@ def predict(args: argparse.Namespace):
     # Predict
     y_pred = network.predict(X)
 
-    # Accuracy
-    diagnosis_valid = (
-        "diagnosis" in df.columns
-        and not df["diagnosis"].isna().any()
-    )
-    if config.display_accuracy and diagnosis_valid:
-        _display_prediction_accuracy(df, y_pred)
+    # Evaluate
+    diagnosis_valid = "diagnosis" in df.columns and not df["diagnosis"].isna().any()
+    if diagnosis_valid:
+        y_true = get_target(df).T
+        # Loss
+        print(f"Loss: {binary_cross_entropy(y_true, y_pred)}")
+        # Accuracy
+        if config.display_accuracy:
+            print(f"Accuracy: {ft_accuracy(y_true, y_pred):.2f}%")
 
     # Save Prediction to file
     _save_pred_to_file(y_pred, config.output_file)
