@@ -1,9 +1,10 @@
 # PYTHON_ARGCOMPLETE_OK
 
+import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import sys
-import matplotlib.pyplot as plt
 
 from src.load_dataset import load_dataset
 from src.parsing.feature_analysis.parsing import parse_command_line
@@ -14,7 +15,7 @@ def _feature_selection(df: pd.DataFrame, features_nb_to_keep: int):
     Print the N features most correlated with
     diagnosis, pruning redundant pairs.
     """
-    df["diagnosis"] = (df["diagnosis"] == "M").astype('int')
+    df["diagnosis"] = (df["diagnosis"] == "M").astype("int")
 
     diagnosis_corr = df.corr()["diagnosis"].abs()
 
@@ -34,7 +35,7 @@ def _feature_selection(df: pd.DataFrame, features_nb_to_keep: int):
 
     # Remove correlated features
     removed_features = []
-    for (feat_a, feat_b) in feature_corr.index:
+    for feat_a, feat_b in feature_corr.index:
         nb_removed_features = len(removed_features)
         if nb_relevant_features - nb_removed_features == features_nb_to_keep:
             break
@@ -85,8 +86,10 @@ def main():
     except (FileNotFoundError, PermissionError, IsADirectoryError) as e:
         print(f"{type(e).__name__}: {e}", file=sys.stderr)
         sys.exit(1)
-
     except (KeyError, ValueError) as e:
+        print(f"{type(e).__name__}: {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
         print(f"{type(e).__name__}: {e}", file=sys.stderr)
         sys.exit(1)
 

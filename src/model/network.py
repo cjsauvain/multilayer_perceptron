@@ -1,4 +1,3 @@
-
 import numpy as np
 from tqdm import tqdm
 
@@ -14,7 +13,7 @@ class EarlyStopping:
         """Initialize the patience counter and best loss seen so far."""
         self.patience = patience
         self.counter = patience
-        self.best_loss = float('inf')
+        self.best_loss = float("inf")
 
     def should_stop(self):
         """Return True once the patience counter has been exhausted."""
@@ -67,11 +66,7 @@ class Network:
             layer.initialize(n_in)
             n_in = layer.n_neurons
 
-    def load_parameters(
-            self,
-            W: tuple[np.ndarray],
-            b: tuple[np.ndarray]
-    ):
+    def load_parameters(self, W: tuple[np.ndarray], b: tuple[np.ndarray]):
         """Assign pre-trained weights and biases to each layer, in order."""
         for layer_index, layer in enumerate(self.layers):
             layer.W = W[layer_index]
@@ -80,6 +75,7 @@ class Network:
     def save_parameters(self, params_path: str):
         """Save the best recorded weights and biases to an .npz file."""
         np.savez(params_path, **self.params)
+        print(f"Weights and biases saved to '{params_path}'")
 
     def _update_best_parameters(self):
         """Snapshot each layer's current weights and biases as the new best."""
@@ -108,12 +104,7 @@ class Network:
 
         return prev_A
 
-    def backward(
-            self,
-            y_true: np.ndarray,
-            y_pred: np.ndarray,
-            learning_rate: float
-    ):
+    def backward(self, y_true: np.ndarray, y_pred: np.ndarray, learning_rate: float):
         """
         Run a backward pass through all layers, updating their parameters.
         """
@@ -123,11 +114,11 @@ class Network:
             dA = layer.backward(dA, learning_rate)
 
     def _evaluate(
-            self,
-            X: np.ndarray,
-            y_true: np.ndarray,
-            mode: str,
-            y_pred: np.ndarray | None = None
+        self,
+        X: np.ndarray,
+        y_true: np.ndarray,
+        mode: str,
+        y_pred: np.ndarray | None = None,
     ) -> float:
         """
         Compute loss and metrics for a set,
@@ -157,15 +148,15 @@ class Network:
         return loss
 
     def fit(
-            self,
-            X_train: np.ndarray,
-            y_train: np.ndarray,
-            X_valid: np.ndarray,
-            y_valid: np.ndarray,
-            epochs: int,
-            disable_epochs_metrics: bool,
-            learning_rate: float,
-            patience: int
+        self,
+        X_train: np.ndarray,
+        y_train: np.ndarray,
+        X_valid: np.ndarray,
+        y_valid: np.ndarray,
+        epochs: int,
+        disable_epochs_metrics: bool,
+        learning_rate: float,
+        patience: int,
     ):
         """
         Train the network with gradient descent
@@ -175,7 +166,8 @@ class Network:
 
         early_stopping = EarlyStopping(patience)
         epochs_iter = (
-            tqdm(range(1, epochs + 1)) if disable_epochs_metrics
+            tqdm(range(1, epochs + 1))
+            if disable_epochs_metrics
             else range(1, epochs + 1)
         )
 
@@ -195,7 +187,7 @@ class Network:
             if disable_epochs_metrics is False:
                 print(
                     f"epoch {epoch}/{epochs} - ",
-                    f"loss: {loss_train:.4f} - val_loss: {loss_valid:.4f}"
+                    f"loss: {loss_train:.4f} - val_loss: {loss_valid:.4f}",
                 )
 
             # Early Stopping
@@ -207,7 +199,8 @@ class Network:
         self._restore_best_parameters()
 
         self.stopping_reason = (
-            f"early stopping (epoch: {epoch})" if early_stopping.counter == 0
+            f"early stopping (epoch: {epoch})"
+            if early_stopping.counter == 0
             else f"max epochs reached: {epochs}"
         )
 
