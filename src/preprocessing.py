@@ -3,9 +3,9 @@ import pandas as pd
 
 
 def min_max(
-        df: pd.DataFrame,
-        mins: np.ndarray | None = None,
-        maxs: np.ndarray | None = None
+    df: pd.DataFrame,
+    mins: np.ndarray | None = None,
+    maxs: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Scale features to [0, 1] using given or computed min/max bounds."""
     X = np.array(df)
@@ -19,9 +19,9 @@ def min_max(
 
 
 def z_score(
-        df: pd.DataFrame,
-        means: np.ndarray | None = None,
-        stds: np.ndarray | None = None
+    df: pd.DataFrame,
+    means: np.ndarray | None = None,
+    stds: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Standardize features using given or computed mean/standard deviation."""
     X = np.array(df)
@@ -36,10 +36,11 @@ def z_score(
 
 def get_target(df: pd.DataFrame) -> np.ndarray:
     """One-hot encode the diagnosis column into B/M columns."""
-    y_df = df["diagnosis"]
-
     # First column: 0="M", 1="B"
     # Second column: 0="B", 1="M"
-    y = pd.get_dummies(y_df).astype(int).to_numpy()
-
-    return y
+    return np.column_stack(
+        [
+            (df["diagnosis"] == "B").astype(int),
+            (df["diagnosis"] == "M").astype(int),
+        ]
+    )
