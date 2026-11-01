@@ -11,7 +11,7 @@ from src.load_dataset import load_dataset
 from src.model.builder import network_builder
 from src.model.loss import binary_cross_entropy
 from src.model.metrics import ft_accuracy
-from src.parsing.mlp.schema_validation import validate_model_schema
+from src.model.schema import validate_model_schema
 from src.preprocessing import get_target, min_max, z_score
 
 

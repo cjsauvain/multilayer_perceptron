@@ -1,12 +1,13 @@
 import argparse
 import json
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
 
-from dataclasses import dataclass
-from src.parsing.mlp.schema_validation import validate_model_schema
 from src.load_dataset import load_dataset
 from src.model.builder import network_builder
+from src.model.schema import validate_model_schema
 from src.preprocessing import get_target, min_max, z_score
 from src.visualization import visualization
 
@@ -52,17 +53,17 @@ def _get_train_config(args: argparse.Namespace) -> TrainConfig:
         params_path=args.params_path,
         model_path=args.model_path,
         seed=args.seed,
-        patience=args.patience
+        patience=args.patience,
     )
 
 
 def _save_model_to_file(
-        model_path: str,
-        layers: tuple[int, ...],
-        activation: str,
-        features: list[str],
-        weights_initializer: str,
-        normalization: dict
+    model_path: str,
+    layers: tuple[int, ...],
+    activation: str,
+    features: list[str],
+    weights_initializer: str,
+    normalization: dict,
 ):
     """
     Write the model architecture, features and
@@ -73,7 +74,7 @@ def _save_model_to_file(
         "activation": activation,
         "features": features,
         "weights_initializer": weights_initializer,
-        "normalization": normalization["normalization"]
+        "normalization": normalization["normalization"],
     }
 
     with open(model_path, "w") as file:
@@ -81,10 +82,10 @@ def _save_model_to_file(
 
 
 def _preprocessing(
-        training_df: pd.DataFrame,
-        validation_df: pd.DataFrame,
-        normalization_method: str,
-        features: list[str]
+    training_df: pd.DataFrame,
+    validation_df: pd.DataFrame,
+    normalization_method: str,
+    features: list[str],
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict]:
     """Normalize train/validation features and one-hot encode their targets."""
     X_train = np.array(())
@@ -92,9 +93,7 @@ def _preprocessing(
     y_train = get_target(training_df)
     y_valid = get_target(validation_df)
 
-    json_normalization = {
-        "normalization": {}
-    }
+    json_normalization = {"normalization": {}}
 
     # Z-Score
     if normalization_method == "z-score":
@@ -146,7 +145,7 @@ def train(args: argparse.Namespace):
         config.activation,
         config.features,
         config.weights_initializer,
-        json_normalization
+        json_normalization,
     )
 
     # Create Neuron Network
@@ -154,9 +153,7 @@ def train(args: argparse.Namespace):
         np.random.seed(config.seed)
 
     network = network_builder(
-        config.layers,
-        config.activation,
-        config.weights_initializer
+        config.layers, config.activation, config.weights_initializer
     )
 
     # Fit
@@ -168,13 +165,17 @@ def train(args: argparse.Namespace):
         config.epochs,
         config.disable_epochs_metrics,
         config.learning_rate,
-        config.patience
+        config.patience,
     )
     # Training Stopping Reason
     print(f"\nTraining Stopping Reason: {network.stopping_reason}")
+    # Best Epoch
+    print(f"\nBest  epoch: {network.best_epoch}")
+    # Best Loss
+    print(f"Valid loss: {network.loss_valid[-1]:.4f}")
     # Display Train + Valid Accuracy
-    print(f"\ntrain accuracy: {network.acc_train[-1]:.2f}%")
-    print(f"valid accuracy: {network.acc_valid[-1]:.2f}%\n")
+    print(f"Train accuracy: {network.acc_train[-1]:.2f}%")
+    print(f"Valid accuracy: {network.acc_valid[-1]:.2f}%\n")
 
     # Save parameters W + b to .npz file
     network.save_parameters(config.params_path)
