@@ -53,6 +53,7 @@ class Network:
         self.f1_score_train = []
         self.f1_score_valid = []
         self.stopping_reason = ""
+        self.best_epoch = 0
 
     def __repr__(self):
         """Return the layers' representation."""
@@ -90,6 +91,21 @@ class Network:
         for layer_index, layer in enumerate(self.layers, start=1):
             layer.W = np.copy(self.params[f"W{layer_index}"])
             layer.b = np.copy(self.params[f"b{layer_index}"])
+
+    def _truncate_history_to_best_epoch(self):
+        best_epoch = self.best_epoch
+        # Train
+        self.loss_train = self.loss_train[:best_epoch]
+        self.acc_train = self.acc_train[:best_epoch]
+        self.precision_train = self.precision_train[:best_epoch]
+        self.recall_train = self.recall_train[:best_epoch]
+        self.f1_score_train = self.f1_score_train[:best_epoch]
+        # Valid
+        self.loss_valid = self.loss_valid[:best_epoch]
+        self.acc_valid = self.acc_valid[:best_epoch]
+        self.precision_valid = self.precision_valid[:best_epoch]
+        self.recall_valid = self.recall_valid[:best_epoch]
+        self.f1_score_valid = self.f1_score_valid[:best_epoch]
 
     def forward(self, X_train: np.ndarray) -> np.ndarray:
         """
@@ -180,23 +196,26 @@ class Network:
             self.backward(y_train, y_pred, learning_rate)
 
             # Evaluate Loss + Accuracy
+            y_pred = self.forward(X_train)
             loss_train = self._evaluate(X_train, y_train, "train", y_pred)
             loss_valid = self._evaluate(X_valid, y_valid, "valid")
 
             # Display Epochs Metrics
             if disable_epochs_metrics is False:
                 print(
-                    f"epoch {epoch}/{epochs} - ",
+                    f"epoch {epoch}/{epochs} -",
                     f"loss: {loss_train:.4f} - val_loss: {loss_valid:.4f}",
                 )
 
             # Early Stopping
             if early_stopping.update_loss(loss_valid):
                 self._update_best_parameters()
+                self.best_epoch = epoch
             if early_stopping.should_stop():
                 break
 
         self._restore_best_parameters()
+        self._truncate_history_to_best_epoch()
 
         self.stopping_reason = (
             f"early stopping (epoch: {epoch})"
