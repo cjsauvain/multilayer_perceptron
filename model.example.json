@@ -1,0 +1,14 @@
+{
+    "layers": [16, 16, 2],
+    "activation": "relu",
+    "features": [
+        "perimeter_worst",
+        "compactness_worst",
+        "concavity_worst",
+        "concave_points_worst"
+    ],
+    "weights_initializer": "HeNormal",
+    "normalization": {
+        "mode": "z-score"
+    }
+}
