@@ -1,4 +1,4 @@
-# multilayer_perceptron
+# Multi-Layer Perceptron
 
 From-scratch (NumPy) implementation of a multilayer perceptron (MLP) trained with
 gradient descent backpropagation, applied to breast cancer diagnosis on the
@@ -64,7 +64,7 @@ The project requires Python 3.10+ and the following
 dependencies:
 
 ```bash
-pip install numpy pandas matplotlib tqdm jsonschema argcomplete
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -150,6 +150,7 @@ training).
 
 Training uses early stopping based on the validation loss (`--patience` epochs
 without improvement), restores the best weights found, then saves:
+
 - weights/biases to `params.npz`;
 - architecture, features and normalization parameters to `model.json`.
 
