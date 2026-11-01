@@ -1,6 +1,5 @@
 __pycache__
 predictions/
-datasets/dataset_training.csv
-datasets/dataset_validation.csv
+datasets/
 params.npz
 model.json
