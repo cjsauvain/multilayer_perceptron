@@ -93,5 +93,5 @@
             "required": ["mode"]
         }
     },
-    "required": ["layers", "activation", "features", "weights_initializer", "normalization"]
+    "required": ["activation", "features", "weights_initializer", "normalization"]
 }

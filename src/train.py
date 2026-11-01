@@ -36,20 +36,20 @@ def _get_train_config(args: argparse.Namespace) -> TrainConfig:
     Build a TrainConfig by merging CLI arguments
     with the validated model.json.
     """
-    model_json = validate_model_schema(args.model_path, return_model=True)
+    model = validate_model_schema(args.model_path)
 
     return TrainConfig(
         dataset_training=args.dataset_training,
         dataset_validation=args.dataset_validation,
-        layers=model_json["layers"],
-        features=model_json["features"],
-        activation=model_json["activation"],
-        weights_initializer=model_json["weights_initializer"],
+        layers=model["layers"],
+        features=model["features"],
+        activation=model["activation"],
+        weights_initializer=model["weights_initializer"],
         learning_rate=args.learning_rate,
         epochs=args.epochs,
         disable_epochs_metrics=args.disable_epochs_metrics,
         disable_visualization=args.disable_visualization,
-        normalization=model_json["normalization"]["mode"],
+        normalization=model["normalization"]["mode"],
         params_path=args.params_path,
         model_path=args.model_path,
         seed=args.seed,

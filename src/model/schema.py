@@ -4,10 +4,9 @@ from pathlib import Path
 from jsonschema import validate
 
 
-def validate_model_schema(model_path: str, return_model: bool = False) -> dict | None:
+def validate_model_schema(model_path: str) -> dict:
     """
-    Validate a model.json file against model.schema.json,
-    optionally returning it.
+    Validate a model.json file against model.schema.json and return it.
     """
     with open(model_path, "r") as file:
         model = json.load(file)
@@ -18,6 +17,7 @@ def validate_model_schema(model_path: str, return_model: bool = False) -> dict |
 
     validate(instance=model, schema=schema)
 
-    if return_model:
-        return model
-    return None
+    if "layers" not in model:
+        model["layers"] = [24, 24, 2]
+
+    return model
