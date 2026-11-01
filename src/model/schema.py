@@ -1,12 +1,10 @@
 import json
+from pathlib import Path
 
 from jsonschema import validate
 
 
-def validate_model_schema(
-        model_path: str,
-        return_model: bool = False
-) -> dict | None:
+def validate_model_schema(model_path: str, return_model: bool = False) -> dict | None:
     """
     Validate a model.json file against model.schema.json,
     optionally returning it.
@@ -14,7 +12,8 @@ def validate_model_schema(
     with open(model_path, "r") as file:
         model = json.load(file)
 
-    with open("model.schema.json", "r") as file:
+    SCHEMA_PATH = Path(__file__).resolve().parents[2] / "model.schema.json"
+    with open(SCHEMA_PATH, "r") as file:
         schema = json.load(file)
 
     validate(instance=model, schema=schema)
