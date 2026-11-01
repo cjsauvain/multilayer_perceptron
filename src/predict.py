@@ -1,5 +1,4 @@
 import argparse
-import json
 import os
 import re
 from dataclasses import dataclass
@@ -22,11 +21,15 @@ class PredictConfig:
     model_path: str
     display_accuracy: bool
     output_file: str
+    layers: tuple[int, ...]
+    activation: str
+    features: list[str]
+    normalization: dict
 
 
 def _get_predict_config(args: argparse.Namespace) -> PredictConfig:
-    """Validate model.json and build a PredictConfig from CLI arguments."""
-    validate_model_schema(args.model_path)
+    """Validate the model file and build a PredictConfig from it and CLI arguments."""
+    model = validate_model_schema(args.model_path)
 
     return PredictConfig(
         dataset_path=args.dataset,
@@ -34,10 +37,16 @@ def _get_predict_config(args: argparse.Namespace) -> PredictConfig:
         model_path=args.model_path,
         display_accuracy=args.display_accuracy,
         output_file=args.output_file,
+        layers=model["layers"],
+        activation=model["activation"],
+        features=model["features"],
+        normalization=model["normalization"],
     )
 
 
-def _retrieve_params(params_path: str) -> tuple[tuple[np.ndarray], tuple[np.ndarray]]:
+def _retrieve_params(
+    params_path: str,
+) -> tuple[tuple[np.ndarray], tuple[np.ndarray]]:
     """
     Load and order the per-layer weight and bias arrays from an .npz file.
     """
@@ -52,24 +61,6 @@ def _retrieve_params(params_path: str) -> tuple[tuple[np.ndarray], tuple[np.ndar
     b = [params[key] for key in keys_b]
 
     return tuple(W), tuple(b)
-
-
-def _retrieve_model_config(
-    model_path: str,
-) -> tuple[tuple[int, ...], str, list[str], dict]:
-    """
-    Read the architecture, activation, features and
-    normalization from model.json.
-    """
-    with open(model_path, "r") as file:
-        model_json = json.load(file)
-
-        return (
-            model_json["layers"],
-            model_json["activation"],
-            model_json["features"],
-            model_json["normalization"],
-        )
 
 
 def _save_pred_to_file(y_pred: np.ndarray, output_file: str):
@@ -114,22 +105,18 @@ def predict(args: argparse.Namespace):
     """
     Run the full prediction pipeline: load model/params, predict, save results.
     """
+    # Validate the model and build the prediction config
     config = _get_predict_config(args)
-
-    # Retrieve model's architecture, features and normalization data
-    layers, activation, features, normalization = _retrieve_model_config(
-        config.model_path
-    )
 
     # Retrieve network parameters
     W, b = _retrieve_params(config.params_path)
 
     # Build X ndarray from DataFrame to predict
     df = load_dataset(config.dataset_path)
-    X = _preprocessing(df, features, normalization)
+    X = _preprocessing(df, config.features, config.normalization)
 
     # Create Neuron Network
-    network = network_builder(layers, activation)
+    network = network_builder(config.layers, config.activation)
 
     # Initialize network parameters
     network.load_parameters(W, b)
@@ -138,7 +125,9 @@ def predict(args: argparse.Namespace):
     y_pred = network.predict(X)
 
     # Evaluate
-    diagnosis_valid = "diagnosis" in df.columns and not df["diagnosis"].isna().any()
+    diagnosis_valid = (
+        "diagnosis" in df.columns and not df["diagnosis"].isna().any()
+    )
     if diagnosis_valid:
         y_true = get_target(df).T
         # Loss
