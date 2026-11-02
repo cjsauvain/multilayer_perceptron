@@ -8,8 +8,9 @@ BASE_FEATURES = (
     "concavity",
     "concave_points",
     "symmetry",
-    "fractal_dimension"
+    "fractal_dimension",
 )
 SUFFIXES = ("_mean", "_se", "_worst")
 FEATURES = tuple(f"{f}{s}" for s in SUFFIXES for f in BASE_FEATURES)
 COLUMNS = ("ID", "diagnosis") + FEATURES
+BATCH_SIZE = 32
