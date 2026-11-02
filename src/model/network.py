@@ -1,11 +1,10 @@
 import numpy as np
 from tqdm import tqdm
 
+from constants import BATCH_SIZE
 from src.model.layer import DenseLayer
 from src.model.loss import binary_cross_entropy
 from src.model.metrics import ft_accuracy, ft_f1_score, ft_precision, ft_recall
-
-BATCH_SIZE = 32
 
 
 class EarlyStopping:
