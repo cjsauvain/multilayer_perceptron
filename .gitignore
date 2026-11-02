@@ -3,3 +3,5 @@ predictions/
 datasets/
 params.npz
 model.json
+.venv
+.vscode/
