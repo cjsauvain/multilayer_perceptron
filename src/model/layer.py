@@ -9,17 +9,17 @@ from src.model.activation import (
 )
 from src.model.initializer import (
     glorot_normal_initializer,
-    he_normal_initializer
+    he_normal_initializer,
 )
 
 ACTIVATIONS = {
     "softmax": (softmax, None),
     "sigmoid": (sigmoid, sigmoid_deriv),
-    "relu": (relu, relu_deriv)
+    "relu": (relu, relu_deriv),
 }
 INITIALIZERS = {
     "HeNormal": he_normal_initializer,
-    "GlorotNormal": glorot_normal_initializer
+    "GlorotNormal": glorot_normal_initializer,
 }
 
 
@@ -27,10 +27,10 @@ class DenseLayer:
     """A fully connected layer with its own weights, biases and activation."""
 
     def __init__(
-            self,
-            n_neurons: int,
-            activation: str = "relu",
-            weights_initializer: str = "HeNormal"
+        self,
+        n_neurons: int,
+        activation: str = "relu",
+        weights_initializer: str = "HeNormal",
     ):
         """Configure the layer's size, activation and weights initializer."""
         self.n_neurons = n_neurons
@@ -44,7 +44,8 @@ class DenseLayer:
     def __repr__(self) -> str:
         """Return a readable summary of the layer's configuration."""
         activation_deriv_str = (
-            self.activation_deriv.__name__ if self.activation_deriv is not None
+            self.activation_deriv.__name__
+            if self.activation_deriv is not None
             else "None"
         )
         return (
@@ -69,10 +70,7 @@ class DenseLayer:
         self.A = self.activation_fn(self.prev_A, self.W, self.b)
 
     def backward(
-            self,
-            dA: np.ndarray,
-            learning_rate: float,
-            output_layer: bool = False
+        self, dA: np.ndarray, learning_rate: float, output_layer: bool = False
     ) -> np.ndarray:
         """
         Compute gradients, update weights/biases,
@@ -83,8 +81,8 @@ class DenseLayer:
         dZ = dA if output_layer else dA * self.activation_deriv(self.A)
         dA_prev = self.W.T.dot(dZ)
 
-        dW = (1/m) * dZ.dot(self.prev_A.T)
-        db = (1/m) * np.sum(dZ, axis=1, keepdims=True)
+        dW = (1 / m) * dZ.dot(self.prev_A.T)
+        db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
 
         self.W -= learning_rate * dW
         self.b -= learning_rate * db

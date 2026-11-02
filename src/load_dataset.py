@@ -4,9 +4,7 @@ from src.constants import COLUMNS
 
 
 def load_dataset(
-        dataset_path: str,
-        shuffle: bool = False,
-        seed: int | None = None
+    dataset_path: str, shuffle: bool = False, seed: int | None = None
 ) -> pd.DataFrame:
     """
     Load a WDBC dataset CSV, applying column names if the file has no header.
@@ -20,10 +18,6 @@ def load_dataset(
         df = pd.read_csv(dataset_path)
 
     if shuffle:
-        df = (
-            df
-            .sample(frac=1, random_state=seed)
-            .reset_index(drop=True)
-        )
+        df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
 
     return df
