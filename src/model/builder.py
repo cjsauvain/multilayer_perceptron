@@ -1,11 +1,11 @@
-from src.model.network import Network
 from src.model.layer import DenseLayer
+from src.model.network import Network
 
 
 def network_builder(
-        layers: tuple[int, ...],
-        activation: str,
-        weights_initializer: str = "HeNormal"
+    layers: tuple[int, ...],
+    activation: str,
+    weights_initializer: str = "HeNormal",
 ) -> Network:
     """
     Build a Network with the given hidden layer sizes
