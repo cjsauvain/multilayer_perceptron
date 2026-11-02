@@ -166,6 +166,7 @@ def train(args: argparse.Namespace):
         config.disable_epochs_metrics,
         config.learning_rate,
         config.patience,
+        config.seed,
     )
     # Training Stopping Reason
     print(f"\nTraining Stopping Reason: {network.stopping_reason}")

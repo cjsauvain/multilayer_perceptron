@@ -176,6 +176,7 @@ class Network:
         disable_epochs_metrics: bool,
         learning_rate: float,
         patience: int,
+        seed: int,
     ):
         """
         Train the network with gradient descent
@@ -191,9 +192,10 @@ class Network:
         )
 
         epoch = 0
+        rgn = np.random.default_rng(seed=seed)
         for epoch in epochs_iter:
             # Shuffle
-            permuted_indexes = np.random.permutation(len(X_train.T))
+            permuted_indexes = rgn.permutation(len(X_train.T))
             X_train = X_train[:, permuted_indexes]
             y_train = y_train[:, permuted_indexes]
             # Mini-batch
