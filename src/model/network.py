@@ -5,6 +5,8 @@ from src.model.layer import DenseLayer
 from src.model.loss import binary_cross_entropy
 from src.model.metrics import ft_accuracy, ft_f1_score, ft_precision, ft_recall
 
+BATCH_SIZE = 32
+
 
 class EarlyStopping:
     """Tracks validation loss to decide when training should stop."""
@@ -120,7 +122,9 @@ class Network:
 
         return prev_A
 
-    def backward(self, y_true: np.ndarray, y_pred: np.ndarray, learning_rate: float):
+    def backward(
+        self, y_true: np.ndarray, y_pred: np.ndarray, learning_rate: float
+    ):
         """
         Run a backward pass through all layers, updating their parameters.
         """
@@ -189,11 +193,20 @@ class Network:
 
         epoch = 0
         for epoch in epochs_iter:
-            # Forward Propagation
-            y_pred = self.forward(X_train)
+            # Shuffle
+            permuted_indexes = np.random.permutation(len(X_train.T))
+            X_train = X_train[:, permuted_indexes]
+            y_train = y_train[:, permuted_indexes]
+            # Mini-batch
+            for start in range(0, len(X_train), BATCH_SIZE):
+                X_train_batch = X_train[:, start : start + BATCH_SIZE]
+                y_train_batch = y_train[:, start : start + BATCH_SIZE]
 
-            # Backward Propagation
-            self.backward(y_train, y_pred, learning_rate)
+                # Forward Propagation
+                y_pred = self.forward(X_train_batch)
+
+                # Backward Propagation
+                self.backward(y_train_batch, y_pred, learning_rate)
 
             # Evaluate Loss + Accuracy
             y_pred = self.forward(X_train)
