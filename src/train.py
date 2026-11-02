@@ -170,12 +170,13 @@ def train(args: argparse.Namespace):
     # Training Stopping Reason
     print(f"\nTraining Stopping Reason: {network.stopping_reason}")
     # Best Epoch
-    print(f"\nBest  epoch: {network.best_epoch}")
-    # Best Loss
+    print(f"\nBest epoch: {network.best_epoch}\n")
+    # Display Metrics
     print(f"Valid loss: {network.loss_valid[-1]:.4f}")
-    # Display Train + Valid Accuracy
-    print(f"Train accuracy: {network.acc_train[-1]:.2f}%")
-    print(f"Valid accuracy: {network.acc_valid[-1]:.2f}%\n")
+    print(f"Valid accuracy: {network.acc_valid[-1]:.2f}%")
+    print(f"Valid precision: {network.precision_valid[-1]:.2f}%")
+    print(f"Valid recall: {network.recall_valid[-1]:.2f}%")
+    print(f"Valid F1-score: {network.f1_score_valid[-1]:.2f}%\n")
 
     # Save parameters W + b to .npz file
     network.save_parameters(config.params_path)
