@@ -2,7 +2,7 @@ import argparse
 
 
 def _ratio_between_0_and_1(value: str) -> float:
-    """Parse a CLI argument as a float strictly greater than 0 and up to 1."""
+    """Parse a CLI argument as a float strictly between 0 and 1."""
     f = float(value)
 
     if not 0 < f < 1:
