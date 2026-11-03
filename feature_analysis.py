@@ -9,61 +9,83 @@ import pandas as pd
 from src.load_dataset import load_dataset
 from src.parsing.feature_analysis.parsing import parse_command_line
 
+MIN_DIAGNOSIS_CORRELATION = 0.3
+MAX_FEATURE_CORRELATION = 0.9
+RED = "\033[1;4;31m"
+RESET = "\033[0m"
 
-def _feature_selection(df: pd.DataFrame, features_nb_to_keep: int):
+
+def _feature_selection(df: pd.DataFrame):
     """
-    Print the N features most correlated with
-    diagnosis, pruning redundant pairs.
+    Print the most correlated features with diagnosis, pruning redundant pairs.
     """
+    # Keep features with correlation >= 0.3 with diagnosis
+    df = df.drop(columns="ID", errors="ignore")
     df["diagnosis"] = (df["diagnosis"] == "M").astype("int")
+    diagnosis_corr = (
+        df.corr()["diagnosis"]
+        .abs()
+        .drop(labels="diagnosis")
+        .sort_values(ascending=False)
+    )
+    relevant_features = diagnosis_corr[
+        diagnosis_corr >= MIN_DIAGNOSIS_CORRELATION
+    ].index
+    relevant_features_df = df[relevant_features]
 
-    diagnosis_corr = df.corr()["diagnosis"].abs()
+    # From relevant features, remove most correlated features
+    corr = relevant_features_df.corr().abs()
 
-    # Keep features with correlation >= 0.5 with diagnosis
-    relevant_features = diagnosis_corr[diagnosis_corr >= 0.5].index
-    df = df[relevant_features]
-    nb_relevant_features = len(df.drop(columns="diagnosis").columns)
+    # Filter out most correlated features
+    kept = []
+    for feature in relevant_features:
+        redundant = any(
+            corr.loc[feature, kept_feature] > MAX_FEATURE_CORRELATION
+            for kept_feature in kept
+        )
+        if not redundant:
+            kept.append(feature)
 
-    # From relevant features, remove correlated features
-    # and keep <features_nb_to_keep> features
-    corr = df.drop(columns=["diagnosis"]).corr().abs()
-    feature_corrs = corr[corr >= 0.7]
-    # Mask upper triangle (+ diagonal) to keep only the lower triangle,
-    # avoiding duplicate pairs (corr matrix is symmetric) and self-correlations
-    mask = np.triu(np.ones(feature_corrs.shape, dtype=bool))
-    feature_corr = feature_corrs.mask(mask).unstack().dropna()
-
-    # Remove correlated features
-    removed_features = []
-    for feat_a, feat_b in feature_corr.index:
-        nb_removed_features = len(removed_features)
-        if nb_relevant_features - nb_removed_features == features_nb_to_keep:
-            break
-        if feat_a not in removed_features and feat_b not in removed_features:
-            feat_a_is_weaker = diagnosis_corr[feat_a] < diagnosis_corr[feat_b]
-            removed_feature = feat_a if feat_a_is_weaker else feat_b
-            removed_features.append(removed_feature)
-
-    # Display selected features
-    print(df.drop(columns=removed_features + ["diagnosis"]).columns)
+    # Display correlations and selected features
+    print(
+        f"\n{RED}Absolute correlation of each feature with diagnosis{RESET}\n"
+    )
+    print(diagnosis_corr.round(3))
+    print(
+        f"\n{RED}Most correlated features (> {MAX_FEATURE_CORRELATION}) excluding diagnosis{RESET}\n"
+    )
+    mask = np.triu(np.ones(corr.shape), k=1).astype(bool)
+    pairs = corr.where(mask).stack().round(3).sort_values(ascending=False)
+    print(pairs[pairs > MAX_FEATURE_CORRELATION])
+    print(
+        f"\n{RED}Features kept by absolute correlation with diagnosis{RESET}\n"
+    )
+    print(diagnosis_corr[kept].round(3))
 
 
 def _feature_visualization(df: pd.DataFrame, visualization_mode: str):
     """Plot every feature individually as a boxplot or scatter plot grid."""
-    df = df.drop(columns=["ID", "diagnosis"])
+    df = df.drop(columns=["ID"], errors="ignore")
+    features = df.drop(columns="diagnosis").columns
 
     _, axes = plt.subplots(5, 6, figsize=(18, 9))
-    features = df.columns
 
     # Visualization Mode
-    if visualization_mode == "boxplot":
-        for ax, feature in zip(axes.ravel(), features):
-            df.boxplot(column=feature, ax=ax)
-            ax.set_title(feature)
-    elif visualization_mode == "scatter_plot":
-        for ax, feature in zip(axes.ravel(), features):
-            ax.scatter(df[feature], range(len(df)))
-            ax.set_title(feature)
+    for ax, feature in zip(axes.ravel(), features):
+        benign = df.loc[df["diagnosis"] == "B", feature]
+        malignant = df.loc[df["diagnosis"] == "M", feature]
+
+        if visualization_mode == "boxplot":
+            ax.boxplot([benign, malignant])
+            ax.set_xticks([1, 2], ["B", "M"])
+        elif visualization_mode == "scatter_plot":
+            ax.scatter(benign, range(len(benign)), s=8, c="tab:blue", label="B")
+            ax.scatter(
+                malignant, range(len(malignant)), s=8, c="tab:orange", label="M"
+            )
+            ax.legend(fontsize=7)
+
+        ax.set_title(feature)
 
     plt.tight_layout()
     plt.show()
@@ -79,7 +101,7 @@ def main():
 
         # Analysis Modes
         if args.mode == "feature-selection":
-            _feature_selection(df, args.features_number)
+            _feature_selection(df)
         if args.mode == "feature-visualization":
             _feature_visualization(df, args.visualization_mode)
 
