@@ -30,7 +30,7 @@ def parse_train_command_line(subparsers: argparse._SubParsersAction):
         "--learning-rate",
         help="Learning rate for gradient descent",
         type=float,
-        default=0.3,
+        default=0.1,
     )
     train_parser.add_argument(
         "--epochs",
@@ -62,5 +62,5 @@ def parse_train_command_line(subparsers: argparse._SubParsersAction):
             "Epochs without validation loss improvement before early stopping"
         ),
         type=positive_int,
-        default=5,
+        default=20,
     )
