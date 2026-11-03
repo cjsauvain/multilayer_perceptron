@@ -195,11 +195,11 @@ class Network:
         rgn = np.random.default_rng(seed=seed)
         for epoch in epochs_iter:
             # Shuffle
-            permuted_indexes = rgn.permutation(len(X_train.T))
+            permuted_indexes = rgn.permutation(X_train.shape[1])
             X_train = X_train[:, permuted_indexes]
             y_train = y_train[:, permuted_indexes]
             # Mini-batch
-            for start in range(0, len(X_train), BATCH_SIZE):
+            for start in range(0, X_train.shape[1], BATCH_SIZE):
                 X_train_batch = X_train[:, start : start + BATCH_SIZE]
                 y_train_batch = y_train[:, start : start + BATCH_SIZE]
 
