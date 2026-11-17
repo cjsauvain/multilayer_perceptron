@@ -1,5 +1,7 @@
 # Multi-Layer Perceptron
 
+![Training and validation curves](images/curves.svg)
+
 From-scratch (NumPy) implementation of a multilayer perceptron (MLP) trained with
 gradient descent backpropagation, applied to breast cancer diagnosis on the
 **Wisconsin Diagnostic Breast Cancer (WDBC)** dataset. The project provides a full
